@@ -1,0 +1,21 @@
+name: Veracode Upload Scan
+
+on:
+  workflow_dispatch:  # Permite rodar manualmente
+
+jobs:
+  upload_scan:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout do repositório
+        uses: actions/checkout@v3
+
+      - name: Veracode Upload & Scan
+        uses: veracode/veracode-upload-and-scan-action@v1.0.20
+        with:
+          appname: "meu_login"
+          createprofile: true
+          filepath: "./"                # Caminho do código ou zip
+          version: "1.0.${{ github.run_number }}"
+          vid: ${{ secrets.VERACODE_API_ID }}
+          vkey: ${{ secrets.VERACODE_API_KEY }}
