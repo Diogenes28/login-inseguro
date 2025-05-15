@@ -12,7 +12,7 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Executar Veracode Pipeline Scan
-        uses: veracode/pipeline-scan-action@v1
+        uses: veracode/Veracode-pipeline-scan-action@v1.0.18
         with:
           vid: ${{ secrets.VERACODE_API_ID }}
           vkey: ${{ secrets.VERACODE_API_KEY }}
