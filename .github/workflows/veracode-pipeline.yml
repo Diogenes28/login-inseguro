@@ -1,0 +1,31 @@
+name: Veracode Pipeline Scan
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  pipeline_scan:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout do repositório
+        uses: actions/checkout@v3
+
+      - name: Executar Veracode Pipeline Scan
+        uses: veracode/pipeline-scan-action@v1
+        with:
+          vid: ${{ secrets.VERACODE_API_ID }}
+          vkey: ${{ secrets.VERACODE_API_KEY }}
+          filepath: .
+          debug: true
+
+      - name: Converter JSON para SARIF
+        uses: veracode/veracode-pipeline-scan-results-to-sarif@master
+        with:
+          file: results.json
+          fail_build: false
+
+      - name: Enviar SARIF para Code Scanning
+        uses: github/codeql-action/upload-sarif@v2
+        with:
+          sarif_file: results.sarif
