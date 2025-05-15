@@ -1,31 +1,37 @@
 name: Veracode Pipeline Scan
 
+# 🚀 Dispara este workflow automaticamente quando houver push na branch main
 on:
   push:
     branches: [main]
 
 jobs:
   pipeline_scan:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest  # 🌐 Roda na nuvem (GitHub Actions)
+
     steps:
+      # 📥 Passo 1: Clona o código do repositório
       - name: Checkout do repositório
         uses: actions/checkout@v3
 
+      # 🔍 Passo 2: Executa o Veracode Pipeline Scan
       - name: Executar Veracode Pipeline Scan
-        uses: veracode/Veracode-pipeline-scan-action@v1.0.18
+        uses: veracode/pipeline-scan-action@v1.0.18  # ✅ Usa a versão correta
         with:
-          vid: ${{ secrets.VERACODE_API_ID }}
-          vkey: ${{ secrets.VERACODE_API_KEY }}
-          filepath: .
-          debug: true
+          vid: ${{ secrets.VERACODE_API_ID }}      # 🔐 ID da API Veracode (armazenado em segredo)
+          vkey: ${{ secrets.VERACODE_API_KEY }}     # 🔐 Key da API Veracode (armazenado em segredo)
+          file: .                                   # 📁 Local onde está o código-fonte
+          debug: true                               # 🐞 Ativa modo de depuração
 
+      # 🔄 Passo 3: Converte o resultado JSON em SARIF (formato que o GitHub entende)
       - name: Converter JSON para SARIF
         uses: veracode/veracode-pipeline-scan-results-to-sarif@master
         with:
-          file: results.json
-          fail_build: false
+          file: results.json          # 📄 Arquivo de saída do pipeline scan
+          fail_build: false           # 🚫 Não falhar mesmo que tenha vulnerabilidades
 
+      # 📤 Passo 4: Envia o arquivo SARIF para a aba "Code scanning" do GitHub
       - name: Enviar SARIF para Code Scanning
         uses: github/codeql-action/upload-sarif@v2
         with:
-          sarif_file: results.sarif
+          sarif_file: results.sarif   # 🧾 Nome do arquivo SARIF convertido
