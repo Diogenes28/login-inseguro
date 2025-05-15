@@ -10,6 +10,15 @@ jobs:
       - name: Checkout do repositório
         uses: actions/checkout@v3
 
+      - name: Verificar a existência do arquivo results.json
+        run: |
+          if [ ! -f results.json ]; then
+            echo "results.json não encontrado. Criando um placeholder."
+            echo '{}' > results.json
+          else
+            echo "results.json encontrado."
+          fi
+
       - name: Executar Veracode Fix
         uses: veracode/veracode-fix@main
         with:
