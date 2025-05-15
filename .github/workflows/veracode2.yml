@@ -1,0 +1,41 @@
+name: Veracode Fix + Code Scanning
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+
+jobs:
+  veracode:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Clonar o repositório
+      uses: actions/checkout@v3
+
+    - name: Fazer upload e análise com Veracode Pipeline Scan
+      uses: veracode/pipeline-scan-action@v1.0.18
+      with:
+        vid: ${{ secrets.VERACODE_API_ID }}
+        vkey: ${{ secrets.VERACODE_API_KEY }}
+        file: .  # pasta atual
+        fail_build: false
+        debug: true
+
+    - name: Converter resultados para SARIF (para o GitHub Code Scanning)
+      uses: veracode/veracode-pipeline-scan-results-to-sarif@master
+      with:
+        input: results.json
+        output: veracode-results.sarif
+
+    - name: Publicar no GitHub Code Scanning
+      uses: github/codeql-action/upload-sarif@v2
+      with:
+        sarif_file: veracode-results.sarif
+
+    - name: Aplicar Veracode Fix (correções automáticas)
+      uses: veracode/veracode-fix@v1
+      with:
+        vid: ${{ secrets.VERACODE_API_ID }}
+        vkey: ${{ secrets.VERACODE_API_KEY }}
+        source-location: .
