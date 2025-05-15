@@ -11,7 +11,7 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Veracode Upload & Scan
-        uses: veracode/veracode-upload-and-scan-action@v1.0.20
+        uses: veracode/veracode-uploadandscan-action@0.2.6
         with:
           appname: "meu_login"
           createprofile: true
