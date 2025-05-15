@@ -13,7 +13,7 @@ jobs:
       - name: Veracode Upload & Scan
         uses: veracode/veracode-uploadandscan-action@0.2.6
         with:
-          appname: "meu_login"
+          appname: "meu_login" # nome do app no VSCODE e na plataforma da VERACODE
           createprofile: true
           filepath: "./"                # Caminho do código ou zip
           version: "1.0.${{ github.run_number }}"
