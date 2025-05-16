@@ -1,63 +1,58 @@
-name: Veracode Scan + Fix
+name: Veracode Scan, Fix e Code Scanning
 
 on:
   workflow_dispatch:  # Executa manualmente
 
 jobs:
-  pipeline_scan:
-    name: 🔍 Veracode Pipeline Scan
+  veracode_job:
     runs-on: ubuntu-latest
 
     steps:
       # 📥 Clona o repositório
-      - name: Checkout do código
+      - name: Checkout do repositório
         uses: actions/checkout@v3
 
-      # 🧪 Executa o scan com a ação oficial da Veracode
+      # 🛡️ Executa o Veracode Pipeline Scan
       - name: Executar Veracode Pipeline Scan
-        uses: veracode/scan-action@v1.1.8
+        uses: veracode/veracode-pipeline-scan-action@v1.0.18
         with:
-          vid: ${{ secrets.VERACODE_API_ID }}         # ID da API
-          vkey: ${{ secrets.VERACODE_API_KEY }}        # Key da API
-          file: '.'                                     # Caminho do projeto
-          type: directory                               # Tipo de input (diretório)
-          debug: true                                   # Modo de depuração
-          scan_type: pipeline                           # Tipo de scan
-          fail_build: false                             # Evita falhar se vulnerabilidades forem encontradas
-          output: results.json                          # Salva resultado no arquivo JSON
+          vid: ${{ secrets.VERACODE_API_ID }}
+          vkey: ${{ secrets.VERACODE_API_KEY }}
+          file: ./  # Pode ser ajustado para apontar para um .zip, .war, etc., se necessário
+          fail_build: false  # Evita falhas no build em caso de vulnerabilidades
 
-      # 💾 Salva o results.json como artefato para o próximo job
-      - name: Salvar results.json como artefato
-        uses: actions/upload-artifact@v3
-        with:
-          name: veracode-results
-          path: results.json
+      # ⚠️ Garante que o arquivo results.json foi gerado
+      - name: Verificar se results.json existe
+        run: |
+          if [ ! -f results.json ]; then
+            echo "results.json não encontrado. Certifique-se de que o Veracode Pipeline Scan gerou esse arquivo."
+            exit 1
+          else
+            echo "results.json encontrado com sucesso."
+          fi
 
-  fix_job:
-    name: 🛠️ Veracode Fix
-    runs-on: ubuntu-latest
-    needs: pipeline_scan   # Só roda após o scan
-
-    steps:
-      # 📥 Clona o repositório
-      - name: Checkout do código
-        uses: actions/checkout@v3
-
-      # 📦 Baixa o results.json salvo pelo job anterior
-      - name: Baixar results.json do artefato
-        uses: actions/download-artifact@v3
-        with:
-          name: veracode-results
-
-      # 🛠️ Executa o Veracode Fix
+      # 🛠️ Executa o Veracode Fix com os parâmetros corretos
       - name: Executar Veracode Fix
         uses: veracode/veracode-fix@1592857014f0d4fd4feb1cde056377814787e696
         with:
           vid: ${{ secrets.VERACODE_API_ID }}
           vkey: ${{ secrets.VERACODE_API_KEY }}
           inputFile: results.json              # Arquivo com os resultados do scan
-          source_base_path_1: '.'              # Caminho do código-fonte
-          fixType: batch                       # Corrige tudo possível (batch)
-          createPR: false                      # true se quiser criar PR automático
-          codeSuggestion: false                # Sugestões em estilo IDE
+          source_base_path_1: '.'              # Caminho da base do código-fonte
+          fixType: batch                       # batch = corrige tudo possível
+          createPR: false                      # true se quiser PRs automáticos
+          codeSuggestion: false                # Sugestões no estilo IDE
           debug: true                          # Ativa modo de depuração
+
+      # 🔄 Converte JSON para SARIF (formato reconhecido pelo GitHub Code Scanning)
+      - name: Converter results.json para SARIF
+        uses: veracode/veracode-pipeline-scan-results-to-sarif@master
+        with:
+          input: results.json
+          output: results.sarif
+
+      # 📤 Envia o SARIF para o GitHub Code Scanning
+      - name: Enviar relatório SARIF para o GitHub
+        uses: github/codeql-action/upload-sarif@v2
+        with:
+          sarif_file: results.sarif
