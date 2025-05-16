@@ -1,21 +1,50 @@
 name: Veracode Upload Scan
 
+# 👇 Permite executar manualmente esse workflow pelo GitHub (via botão "Run workflow")
 on:
-  workflow_dispatch:  # Permite rodar manualmente
+  workflow_dispatch:
 
 jobs:
   upload_scan:
-    runs-on: ubuntu-latest
+    name: 📤 Veracode Upload, Scan & Policy Check
+    runs-on: ubuntu-latest  # 🖥️ Usa uma máquina virtual padrão do GitHub
+
     steps:
+      # 📥 Clona o código do repositório
       - name: Checkout do repositório
         uses: actions/checkout@v3
 
+      # 📦 (Opcional) Compacta o projeto se necessário — útil se o código tiver muitos arquivos
+      # - name: Compactar projeto (opcional)
+      #   run: zip -r app.zip . -x '*.git*'
+
+      # 🚀 Envia e analisa o código no portal da Veracode
       - name: Veracode Upload & Scan
         uses: veracode/veracode-uploadandscan-action@0.2.6
         with:
-          appname: "meu_login" # nome do app no VSCODE e na plataforma da VERACODE
-          createprofile: true
-          filepath: "./"                # Caminho do código ou zip
-          version: "1.0.${{ github.run_number }}"
+          appname: "meu_login"                      # 🏷️ Nome da aplicação no portal Veracode
+          createprofile: true                       # 🆕 Cria o app se não existir
+          filepath: "./"                            # 📂 Caminho do código (ou "app.zip" se compactar)
+          version: "1.0.${{ github.run_number }}"   # 📌 Versão única da análise (útil para histórico)
+          vid: ${{ secrets.VERACODE_API_ID }}       # 🔐 ID da API da Veracode (secreto)
+          vkey: ${{ secrets.VERACODE_API_KEY }}     # 🔐 Chave da API da Veracode (secreta)
+
+      # ✅ Valida se a análise passou na política de segurança definida na Veracode
+      - name: Validar política de segurança
+        id: policy
+        uses: veracode/veracode-policy-scan-action@0.2.4
+        with:
+          appname: "meu_login"                      # 🏷️ Mesmo nome definido na etapa anterior
           vid: ${{ secrets.VERACODE_API_ID }}
           vkey: ${{ secrets.VERACODE_API_KEY }}
+
+      # 📢 Exibe o resultado da política no log do GitHub Actions
+      - name: Mostrar resultado da política
+        run: |
+          echo "Resultado da política: ${{ steps.policy.outputs.passed }}"
+          if [[ "${{ steps.policy.outputs.passed }}" == "true" ]]; then
+            echo "✅ O projeto PASSOU na política de segurança da Veracode!"
+          else
+            echo "❌ O projeto NÃO passou na política de segurança da Veracode."
+            exit 1  # ❗ Finaliza com erro para marcar o job como "falhou"
+          }
