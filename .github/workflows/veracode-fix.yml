@@ -6,6 +6,11 @@ on:
 jobs:
   fix_job:
     runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+      pull-requests: write
+
     steps:
       - name: Checkout do repositório
         uses: actions/checkout@v3
@@ -13,15 +18,20 @@ jobs:
       - name: Verificar a existência do arquivo results.json
         run: |
           if [ ! -f results.json ]; then
-            echo "results.json não encontrado. Criando um placeholder."
-            echo '{}' > results.json
+            echo "results.json não encontrado. Certifique-se de que o Veracode Pipeline Scan foi executado previamente."
+            exit 1
           else
             echo "results.json encontrado."
           fi
 
       - name: Executar Veracode Fix
-        uses: veracode/veracode-fix@1592857014f0d4fd4feb1cde056377814787e696
+        uses: veracode/veracode-fix@v1.0.3
         with:
           vid: ${{ secrets.VERACODE_API_ID }}
           vkey: ${{ secrets.VERACODE_API_KEY }}
-          source-base-path: './'
+          inputFile: results.json
+          source_base_path_1: './'
+          fixType: batch
+          debug: false
+          prComment: false
+          createPR: true
