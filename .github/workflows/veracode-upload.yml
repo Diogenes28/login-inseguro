@@ -32,7 +32,7 @@ jobs:
       # ✅ Valida se a análise passou na política de segurança definida na Veracode
       - name: Validar política de segurança
         id: policy
-        uses: veracode/veracode-policy-scan-action@0.2.4
+        uses: veracode/veracode-policy-scan-action@0.2.3  # 🔄 USANDO A VERSÃO CORRETA
         with:
           appname: "meu_login"                      # 🏷️ Mesmo nome definido na etapa anterior
           vid: ${{ secrets.VERACODE_API_ID }}
