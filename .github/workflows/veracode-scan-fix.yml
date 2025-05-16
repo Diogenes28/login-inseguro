@@ -1,58 +1,70 @@
 name: Veracode Scan, Fix e Code Scanning
 
 on:
-  workflow_dispatch:  # Executa manualmente
+  workflow_dispatch:  # Permite execução manual do workflow
 
 jobs:
   veracode_job:
     runs-on: ubuntu-latest
 
     steps:
-      # 📥 Clona o repositório
+      # 📥 Etapa 1: Clona o repositório
       - name: Checkout do repositório
         uses: actions/checkout@v3
 
-      # 🛡️ Executa o Veracode Pipeline Scan
+      # 🛡️ Etapa 2: Executa o Veracode Pipeline Scan
       - name: Executar Veracode Pipeline Scan
         uses: veracode/veracode-pipeline-scan-action@v1.0.18
         with:
           vid: ${{ secrets.VERACODE_API_ID }}
           vkey: ${{ secrets.VERACODE_API_KEY }}
-          file: ./  # Pode ser ajustado para apontar para um .zip, .war, etc., se necessário
-          fail_build: false  # Evita falhas no build em caso de vulnerabilidades
+          file: ./                          # Caminho do código-fonte ou pacote compactado (.zip, .war etc.)
+          fail_build: false                # Continua mesmo com vulnerabilidades
 
-      # ⚠️ Garante que o arquivo results.json foi gerado
-      - name: Verificar se results.json existe
+      # 🔍 Etapa 3: Verifica se o arquivo results.json foi gerado
+      - name: Verificar se results.json foi gerado
         run: |
           if [ ! -f results.json ]; then
-            echo "results.json não encontrado. Certifique-se de que o Veracode Pipeline Scan gerou esse arquivo."
+            echo "❌ results.json NÃO foi gerado. O Pipeline Scan pode ter falhado ou não encontrou vulnerabilidades."
             exit 1
           else
-            echo "results.json encontrado com sucesso."
+            echo "✅ results.json encontrado com sucesso!"
+            echo "🔎 Primeiras linhas do arquivo:"
+            head -n 20 results.json
           fi
 
-      # 🛠️ Executa o Veracode Fix com os parâmetros corretos
+      # 🛠️ Etapa 4: Executa o Veracode Fix
       - name: Executar Veracode Fix
-        uses: veracode/veracode-fix@1592857014f0d4fd4feb1cde056377814787e696
+        uses: veracode/veracode-fix@v1.0.6
         with:
           vid: ${{ secrets.VERACODE_API_ID }}
           vkey: ${{ secrets.VERACODE_API_KEY }}
           inputFile: results.json              # Arquivo com os resultados do scan
-          source_base_path_1: '.'              # Caminho da base do código-fonte
-          fixType: batch                       # batch = corrige tudo possível
-          createPR: false                      # true se quiser PRs automáticos
-          codeSuggestion: false                # Sugestões no estilo IDE
-          debug: true                          # Ativa modo de depuração
+          source_base_path_1: '.'              # Caminho base do código-fonte
+          fixType: batch                       # Corrige tudo possível automaticamente
+          createPR: false                      # true = cria Pull Requests com correções
+          codeSuggestion: false                # false = sem sugestões estilo IDE
+          debug: true                          # true = mais detalhes no log
 
-      # 🔄 Converte JSON para SARIF (formato reconhecido pelo GitHub Code Scanning)
+      # 🔄 Etapa 5: Converte results.json para SARIF (formato compatível com o GitHub Code Scanning)
       - name: Converter results.json para SARIF
-        uses: veracode/veracode-pipeline-scan-results-to-sarif@master
+        uses: veracode/veracode-pipeline-scan-results-to-sarif@d59328b6e8e1011dc1dd7bcfae6358444c360f62
         with:
           input: results.json
           output: results.sarif
 
-      # 📤 Envia o SARIF para o GitHub Code Scanning
-      - name: Enviar relatório SARIF para o GitHub
-        uses: github/codeql-action/upload-sarif@v3
+      # 🧪 Etapa 6: Verifica se results.sarif foi criado corretamente
+      - name: Verificar se results.sarif foi gerado
+        run: |
+          if [ ! -f results.sarif ]; then
+            echo "❌ results.sarif NÃO foi gerado. Falha na conversão."
+            exit 1
+          else
+            echo "✅ results.sarif gerado com sucesso!"
+          fi
+
+      # 📤 Etapa 7: Envia o relatório SARIF para o GitHub Code Scanning
+      - name: Enviar relatório SARIF para o GitHub Code Scanning
+        uses: github/codeql-action/upload-sarif@v2
         with:
           sarif_file: results.sarif
