@@ -51,7 +51,7 @@ jobs:
 
       # 🛠️ Executa o Veracode Fix
       - name: Executar Veracode Fix
-        uses: veracode/veracode-fix@v1.0.6
+        uses: veracode/veracode-fix@1592857014f0d4fd4feb1cde056377814787e696
         with:
           vid: ${{ secrets.VERACODE_API_ID }}
           vkey: ${{ secrets.VERACODE_API_KEY }}
