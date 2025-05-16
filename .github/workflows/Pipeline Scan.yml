@@ -29,7 +29,7 @@ jobs:
 
       # 🔄 Converte o JSON gerado em SARIF (formato usado pelo GitHub Code Scanning)
       - name: Converter JSON para SARIF
-        uses: veracode/veracode-pipeline-scan-results-to-sarif@master
+        uses: veracode/veracode-pipeline-scan-results-to-sarif@ff08ae5b45d5384cb4679932f184c013d34da9be
         with:
           file: results.json        # 📄 Entrada: JSON gerado pelo Veracode
           fail_build: false         # ❌ Não falha o build, mesmo com vulnerabilidades
