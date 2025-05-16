@@ -1,37 +1,36 @@
 name: Veracode Fix
 
 on:
-  workflow_dispatch:  # Roda manualmente
+  workflow_dispatch:  # Executa manualmente
 
 jobs:
   fix_job:
     runs-on: ubuntu-latest
 
-    permissions:
-      contents: write
-      pull-requests: write
-
     steps:
+      # 📥 Clona o repositório
       - name: Checkout do repositório
         uses: actions/checkout@v3
 
-      - name: Verificar a existência do arquivo results.json
+      # ⚠️ Garante que o arquivo results.json existe (gerado pelo Pipeline Scan)
+      - name: Verificar se results.json existe
         run: |
           if [ ! -f results.json ]; then
-            echo "results.json não encontrado. Certifique-se de que o Veracode Pipeline Scan foi executado previamente."
+            echo "results.json não encontrado. Certifique-se de que o Veracode Pipeline Scan foi executado antes."
             exit 1
           else
-            echo "results.json encontrado."
+            echo "results.json encontrado com sucesso."
           fi
 
+      # 🛠️ Executa o Veracode Fix com os parâmetros corretos
       - name: Executar Veracode Fix
-        uses: veracode/veracode-fix@v1.0.3
+        uses: veracode/veracode-fix@v1.0.6
         with:
           vid: ${{ secrets.VERACODE_API_ID }}
           vkey: ${{ secrets.VERACODE_API_KEY }}
-          inputFile: results.json
-          source_base_path_1: './'
-          fixType: batch
-          debug: false
-          prComment: false
-          createPR: true
+          inputFile: results.json              # Arquivo com os resultados do scan
+          source_base_path_1: '.'              # Caminho da base do código-fonte
+          fixType: batch                       # batch = corrige tudo possível
+          createPR: false                      # true se quiser PRs automáticos
+          codeSuggestion: false                # Sugestões no estilo IDE
+          debug: true                          # Ativa modo de depuração
