@@ -48,7 +48,7 @@ jobs:
 
       # 🔄 Etapa 5: Converte results.json para SARIF (formato compatível com o GitHub Code Scanning)
       - name: Converter results.json para SARIF
-        uses: Veracode/veracode-pipeline-scan-results-to-sarif@v1.0.7
+        uses: veracode/veracode-pipeline-scan-results-to-sarif@v2.0.4
         with:
           input: results.json
           output: results.sarif
