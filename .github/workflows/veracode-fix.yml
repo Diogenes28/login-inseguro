@@ -20,7 +20,7 @@ jobs:
           fi
 
       - name: Executar Veracode Fix
-        uses: veracode/veracode-fix@main
+        uses: veracode/veracode-fix@v1.0.3
         with:
           vid: ${{ secrets.VERACODE_API_ID }}
           vkey: ${{ secrets.VERACODE_API_KEY }}
