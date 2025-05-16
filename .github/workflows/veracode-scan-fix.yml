@@ -53,6 +53,6 @@ jobs:
 
       # 📤 Envia o SARIF para o GitHub Code Scanning
       - name: Enviar relatório SARIF para o GitHub
-        uses: github/codeql-action/upload-sarif@v2
+        uses: github/codeql-action/upload-sarif@v3
         with:
           sarif_file: results.sarif
