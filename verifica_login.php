@@ -1,6 +1,6 @@
 <?php
 // Conexão com o banco de dados (MAMP padrão)
-require_once __DIR__ . '/../login/config.php';
+require_once __DIR__ . '/config.php';
 
 $conn = new mysqli($host, $user, $pass, $db);
 if ($conn->connect_error) {
