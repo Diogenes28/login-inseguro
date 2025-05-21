@@ -20,8 +20,8 @@ jobs:
 
           createprofile: true       # Se for a primeira análise desse app, cria o perfil automaticamente (evita erros)
 
-          filepath: "./config.php,./verifica_login.php"
-    # Caminho do código que será analisado — aqui significa a raiz do repositório, ou seja, todos os arquivos na pasta principal
+          filepath: "app-php.zip"
+          # Caminho do arquivo zipado que contém o código-fonte da aplicação a ser analisada
 
           version: "1.0.${{ github.run_number }}"  # Versão da análise, com número automático para diferenciar execuções
 
