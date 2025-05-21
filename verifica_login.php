@@ -1,6 +1,6 @@
 <?php
 // Conexão com o banco de dados (MAMP padrão)
-require_once __DIR__ . '/config.php';
+require_once __DIR__ . '/../login/config.php';
 
 $conn = new mysqli($host, $user, $pass, $db);
 if ($conn->connect_error) {
@@ -12,22 +12,14 @@ $usuario = $_POST['usuario'];
 $senha = $_POST['senha'];
 
 // Consulta vulnerável a SQL Injection
-$sql = "SELECT * FROM usuarios WHERE usuario =? AND senha =?";
+$sql = "SELECT * FROM usuarios WHERE usuario = '$usuario' AND senha = '$senha'";
+
+// Mostrar a SQL gerada APENAS para demonstração ou teste de invasão
 if (str_contains($usuario, "'") || str_contains($usuario, "--") || str_contains($usuario, "OR")) {
-    echo htmlentities("<p><strong>SQL gerada:</strong> $sql</p>");
+    echo "<p><strong>SQL gerada:</strong> $sql</p>";
 }
 
-$stmt = $conn->prepare($sql);
-  if ($stmt) {
-    $stmt->bind_param('ss', $usuario, $senha);
-    $stmt->execute();
-    $stmt->close();
-}
-$resultado = $conn;
-
-else {
-    echo "Failed to prepare the statement.";
-}
+$resultado = $conn->query($sql);
 
 if ($resultado && $resultado->num_rows > 0) {
     $linha = $resultado->fetch_assoc();
