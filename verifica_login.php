@@ -12,14 +12,22 @@ $usuario = $_POST['usuario'];
 $senha = $_POST['senha'];
 
 // Consulta vulnerável a SQL Injection
-$sql = "SELECT * FROM usuarios WHERE usuario = '$usuario' AND senha = '$senha'";
-
-// Mostrar a SQL gerada APENAS para demonstração ou teste de invasão
+$sql = "SELECT * FROM usuarios WHERE usuario =? AND senha =?";
 if (str_contains($usuario, "'") || str_contains($usuario, "--") || str_contains($usuario, "OR")) {
-    echo "<p><strong>SQL gerada:</strong> $sql</p>";
+    echo htmlentities("<p><strong>SQL gerada:</strong> $sql</p>");
 }
 
-$resultado = $conn->query($sql);
+$stmt = $conn->prepare($sql);
+  if ($stmt) {
+    $stmt->bind_param('ss', $usuario, $senha);
+    $stmt->execute();
+    $stmt->close();
+}
+$resultado = $conn;
+
+else {
+    echo "Failed to prepare the statement.";
+}
 
 if ($resultado && $resultado->num_rows > 0) {
     $linha = $resultado->fetch_assoc();
