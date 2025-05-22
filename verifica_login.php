@@ -1,6 +1,9 @@
 <?php
 // Conexão com o banco de dados (MAMP padrão)
-require_once __DIR__ . '/config.php';
+$host = "localhost";
+$db = "sistema_login";
+$user = "root";
+$pass = "root"; // Se estiver usando o MAMP padrão, a senha é "root"
 
 $conn = new mysqli($host, $user, $pass, $db);
 if ($conn->connect_error) {
