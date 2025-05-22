@@ -15,6 +15,3 @@ if (!$mail->send()) {
     echo 'E-mail enviado com sucesso!';
 }
 ?>
-
-
-<!DOCTYPE html>
