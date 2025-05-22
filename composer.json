@@ -1,0 +1,11 @@
+{
+    "name": "diogenes.carmo/login-inseguro",
+    "autoload": {
+        "psr-4": {
+            "DiogenesCarmo\\LoginInseguro\\": "src/"
+        }
+    },
+    "require": {
+        "phpmailer/phpmailer": "6.1.5"
+    }
+}
