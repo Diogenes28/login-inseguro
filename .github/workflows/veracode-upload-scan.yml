@@ -1,0 +1,25 @@
+name: Veracode Upload Scan
+
+on:
+  workflow_dispatch:
+
+jobs:
+  upload_scan:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout do repositório
+        uses: actions/checkout@v3
+
+      - name: Criar pacote ZIP do código PHP
+        run: zip -r codigo-php.zip . -x ".git/*" ".github/*"
+
+      - name: Veracode Upload & Scan
+        uses: veracode/veracode-uploadandscan-action@0.2.6
+        with:
+          appname: "login-inseguro"
+          createprofile: true
+          filepath: "codigo-php.zip"
+          version: "1.0.${{ github.run_number }}"
+          vid: ${{ secrets.VERACODE_API_ID }}
+          vkey: ${{ secrets.VERACODE_API_KEY }}
