@@ -1,29 +1,23 @@
-name: Veracode Upload Scan          # Nome do workflow que aparece na aba "Actions" do GitHub
+name: Veracode Upload Scan          # Nome do workflow na aba Actions do GitHub
 
 on:
-  workflow_dispatch:        # Permite rodar o workflow manualmente pelo botão "Run workflow" no GitHub
+  workflow_dispatch:                # Permite rodar o workflow manualmente
 
 jobs:
-  upload_scan:              # Nome do job: um conjunto de passos que serão executados juntos
-    runs-on: ubuntu-latest  # Sistema operacional usado para rodar os passos (Ubuntu é o mais comum)
+  upload_scan:
+    runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout do repositório           # Passo 1: baixar o código do repositório para o ambiente onde o workflow roda
-        uses: actions/checkout@v3               # Essa ação baixa o código para que possamos trabalhar com ele
-                                                  # Sem esse passo, os próximos não teriam acesso ao código do seu projeto
+      - name: Checkout do repositório
+        uses: actions/checkout@v3
 
-      - name: Veracode Upload & Scan             # Passo 2: enviar o código para a plataforma Veracode para análise automática
-        uses: veracode/veracode-uploadandscan-action@0.2.6  # Ação oficial que faz o upload e dispara a análise na Veracode
+      - name: Veracode Upload & Scan
+        uses: veracode/veracode-uploadandscan-action@0.2.6
 
         with:
-          appname: "login-inseguro"   # Nome da aplicação na Veracode — deve ser igual ao nome cadastrado lá e no seu projeto
-
-          createprofile: true       # Se for a primeira análise desse app, cria o perfil automaticamente (evita erros)
-
-          filepath: "./"    # Caminho do código que será analisado — aqui significa a raiz do repositório, ou seja, todos os arquivos na pasta principal
-
-          version: "1.0.${{ github.run_number }}"  # Versão da análise, com número automático para diferenciar execuções
-
-          vid: ${{ secrets.VERACODE_API_ID }}  # ID da API da Veracode, guardado com segurança nos segredos do GitHub (não coloque direto aqui!)
-
-          vkey: ${{ secrets.VERACODE_API_KEY }}  # Chave secreta da API da Veracode, também guardada com segurança nos segredos do GitHub
+          appname: "login-inseguro"            # Nome da aplicação na Veracode
+          createprofile: true                  # Cria automaticamente o perfil, se não existir
+          filepath: "codigo-php.zip"           # 👉 ENVIA SOMENTE o arquivo .zip com seu código PHP
+          version: "1.0.${{ github.run_number }}"  # Versão automática
+          vid: ${{ secrets.VERACODE_API_ID }}  # ID da API (guardado com segurança)
+          vkey: ${{ secrets.VERACODE_API_KEY }}  # Chave da API (guardado com segurança)
