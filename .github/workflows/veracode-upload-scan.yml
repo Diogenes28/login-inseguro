@@ -1,25 +1,50 @@
+# Nome do workflow que aparecerá na aba "Actions" do GitHub
 name: Veracode Upload Scan
 
+# Define quando esse workflow será executado.
+# Neste caso, ele será executado manualmente através do botão "Run workflow" no GitHub.
 on:
   workflow_dispatch:
 
 jobs:
+  # Nome do job (conjunto de etapas que rodam em sequência)
   upload_scan:
+    # Ambiente onde o job será executado. "ubuntu-latest" é uma máquina virtual Linux preparada pelo GitHub.
     runs-on: ubuntu-latest
 
     steps:
+      # Etapa para baixar o código-fonte do repositório na máquina virtual.
+      # Isso é necessário para que as próximas etapas possam acessar os arquivos do projeto.
       - name: Checkout do repositório
         uses: actions/checkout@v3
 
+      # Esta etapa cria um arquivo ZIP com todo o código do projeto.
+      # O comando `zip -r` compacta recursivamente todos os arquivos da pasta atual (.)
+      # Os parâmetros `-x ".git/*" ".github/*"` servem para **excluir** a pasta `.git` e a pasta `.github` do ZIP,
+      # pois esses arquivos não são necessários para a análise de segurança.
       - name: Criar pacote ZIP do código PHP
         run: zip -r codigo-php.zip . -x ".git/*" ".github/*"
 
+      # Esta etapa envia o arquivo ZIP com o código para a plataforma Veracode
+      # e inicia uma varredura de segurança (scan) automaticamente.
       - name: Veracode Upload & Scan
+        # Ação oficial da Veracode para fazer upload e scan do código
         uses: veracode/veracode-uploadandscan-action@0.2.6
         with:
+          # Nome da aplicação na Veracode. Se ela ainda não existir, será criada automaticamente.
           appname: "login-inseguro"
+          
+          # Define se a ação deve criar um perfil de aplicação automaticamente se ele ainda não existir.
           createprofile: true
+
+          # Caminho do arquivo ZIP que será enviado para análise.
           filepath: "codigo-php.zip"
+
+          # Versão da aplicação sendo enviada. Usamos `github.run_number` para gerar um número de versão automático,
+          # que aumenta a cada nova execução do workflow (ex: 1.0.1, 1.0.2...).
           version: "1.0.${{ github.run_number }}"
+
+          # Credenciais de API da Veracode, armazenadas com segurança como "secrets" no GitHub.
+          # Esses valores devem ser criados na área de *Settings > Secrets and variables > Actions* do seu repositório.
           vid: ${{ secrets.VERACODE_API_ID }}
           vkey: ${{ secrets.VERACODE_API_KEY }}
