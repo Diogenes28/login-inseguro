@@ -12,18 +12,23 @@ $usuario = $_POST['usuario'];
 $senha = $_POST['senha'];
 
 // Consulta vulnerável a SQL Injection
-$sql = "SELECT * FROM usuarios WHERE usuario = '$usuario' AND senha = '$senha'";
+$sql = "SELECT * FROM usuarios WHERE usuario =? AND senha =?";
 
 // Mostrar a SQL gerada APENAS para testes (vulnerável a XSS)
-if (str_contains($usuario, "'") || str_contains($usuario, "--") || str_contains($usuario, "OR")) {
-    echo "<p><strong>SQL gerada:</strong> $sql</p>"; // vulnerável a XSS se $sql for malicioso
+if (str_contains($sql, "'") || str_contains($sql, "--") || str_contains($sql, "OR")) {
+    echo htmlentities("<p><strong>SQL gerada:</strong> $sql"); // vulnerável a XSS se $sql for malicioso
 }
 
-$resultado = $conn->query($sql);
+$stmt = $conn->prepare("SELECT * FROM usuarios WHERE usuario =? AND senha =?");
+$stmt->bind_param('ss', $usuario, $senha);
+$stmt->
+ $stmt->bindParam(':senha', $senha);
+ $stmt->execute(); // executes the prepared statement
+ $stmt->execute();
 
 if ($resultado && $resultado->num_rows > 0) {
     $linha = $resultado->fetch_assoc();
-    echo "<h2>Login bem-sucedido! Bem-vindo, " . $linha['usuario'] . ".</h2>"; // vulnerável a XSS
+    echo "<h2>Login bem-sucedido! Bem-vindo, ". htmlentities($linha['usuario']). ".</h2>"; // vulnerável a XSS
 } else {
     echo "<h2>Usuário ou senha incorretos.</h2>";
     echo "<a href='login.html'>Voltar para o login</a>";
