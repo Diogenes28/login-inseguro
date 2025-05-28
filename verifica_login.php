@@ -1,5 +1,5 @@
 <?php
-// Conexão com o banco de dados (MAMP padrão)
+// Conexão com o banco de dados
 require_once __DIR__ . '/config.php';
 
 $conn = new mysqli($host, $user, $pass, $db);
@@ -11,23 +11,35 @@ if ($conn->connect_error) {
 $usuario = $_POST['usuario'];
 $senha = $_POST['senha'];
 
-// Consulta vulnerável a SQL Injection
+// ============================================================
+// ❌ VULNERABILIDADE: SQL Injection
+// A entrada do usuário é inserida diretamente na SQL sem validação
 $sql = "SELECT * FROM usuarios WHERE usuario = '$usuario' AND senha = '$senha'";
-
-// Mostrar a SQL gerada APENAS para demonstração ou teste de invasão
-if (str_contains($usuario, "'") || str_contains($usuario, "--") || str_contains($usuario, "OR")) {
-    echo "<p><strong>SQL gerada:</strong> $sql</p>";
-}
-
 $resultado = $conn->query($sql);
 
+// ✅ CORREÇÃO — Substitua as 2 linhas acima por:
+/*
+$stmt = $conn->prepare("SELECT * FROM usuarios WHERE usuario = ? AND senha = ?");
+$stmt->bind_param("ss", $usuario, $senha);
+$stmt->execute();
+$resultado = $stmt->get_result();
+*/
+
+// ============================================================
+// ❌ VULNERABILIDADE: XSS
+// Se o valor no banco tiver código malicioso, ele será exibido sem escape
 if ($resultado && $resultado->num_rows > 0) {
     $linha = $resultado->fetch_assoc();
-    echo "<h2>Login bem-sucedido! Bem-vindo, " . htmlspecialchars($linha['usuario']) . ".</h2>";
+    echo "<h2>Bem-vindo, " . $linha['usuario'] . "!</h2>"; // ⚠️ XSS aqui
 } else {
     echo "<h2>Usuário ou senha incorretos.</h2>";
-    echo "<a href='login.html'>Voltar para o login</a>";
+    echo "<a href='login.html'>Voltar</a>";
 }
+
+// ✅ CORREÇÃO — Substitua a linha de exibição por:
+/*
+echo "<h2>Bem-vindo, " . htmlspecialchars($linha['usuario']) . "!</h2>";
+*/
 
 $conn->close();
 ?>
