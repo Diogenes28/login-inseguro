@@ -23,7 +23,7 @@ jobs:
       # Os parâmetros `-x ".git/*" ".github/*"` servem para **excluir** a pasta `.git` e a pasta `.github` do ZIP,
       # pois esses arquivos não são necessários para a análise de segurança.
       - name: Criar pacote ZIP do código PHP
-        run: zip -r codigo-php.zip . -x ".git/*" ".github/*"
+        run: zip -r login-inseguro.zip . -x ".git/*" ".github/*"
 
       # Esta etapa envia o arquivo ZIP com o código para a plataforma Veracode
       # e inicia uma varredura de segurança (scan) automaticamente.
@@ -38,7 +38,7 @@ jobs:
           createprofile: true
 
           # Caminho do arquivo ZIP que será enviado para análise.
-          filepath: "codigo-php.zip"
+          filepath: "login-inseguro.zip"
 
           # Versão da aplicação sendo enviada. Usamos `github.run_number` para gerar um número de versão automático,
           # que aumenta a cada nova execução do workflow (ex: 1.0.1, 1.0.2...).
