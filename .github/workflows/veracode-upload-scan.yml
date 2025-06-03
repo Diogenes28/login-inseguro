@@ -40,6 +40,10 @@ jobs:
           # Caminho do arquivo ZIP que será enviado para análise.
           filepath: "login-inseguro.zip"
 
+          # Versão da aplicação sendo enviada. Usamos `github.run_number` para gerar um número de versão automático,
+          # que aumenta a cada nova execução do workflow (ex: 1.0.1, 1.0.2...).
+          version: "1.0.${{ github.run_number }}"
+
           # Credenciais de API da Veracode, armazenadas com segurança como "secrets" no GitHub.
           # Esses valores devem ser criados na área de *Settings > Secrets and variables > Actions* do seu repositório.
           vid: ${{ secrets.VERACODE_API_ID }}
