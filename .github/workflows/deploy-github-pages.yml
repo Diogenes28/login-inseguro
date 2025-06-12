@@ -3,21 +3,38 @@ name: Deploy para GitHub Pages
 on:
   push:
     branches:
-      - main  # Executa o deploy toda vez que você fizer push na branch main
+      - main  # Executa sempre que fizer push na branch main
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
 
 jobs:
-  deploy:
+  build:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout do código
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
-      - name: Renomear login.html para index.html (GitHub Pages exige index.html)
+      - name: Renomear login.html para index.html
         run: cp login.html index.html
 
-      - name: Deploy para GitHub Pages
-        uses: peaceiris/actions-gh-pages@v3
+      - name: Upload da página para GitHub Pages
+        uses: actions/upload-pages-artifact@v3
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: .  # Publica a raiz do seu projeto
+          path: '.'  # Publica a raiz do repositório (onde está o index.html)
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Deploy para GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
