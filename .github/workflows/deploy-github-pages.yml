@@ -1,0 +1,23 @@
+name: Deploy para GitHub Pages
+
+on:
+  push:
+    branches:
+      - main  # Executa o deploy toda vez que você fizer push na branch main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v3
+
+      - name: Renomear login.html para index.html (GitHub Pages exige index.html)
+        run: cp login.html index.html
+
+      - name: Deploy para GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: .  # Publica a raiz do seu projeto
