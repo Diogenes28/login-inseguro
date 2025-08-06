@@ -18,7 +18,6 @@ jobs:
       - name: Checkout do repositório
         uses: actions/checkout@v3
 
-      # Esta etapa cria 
       # Esta etapa cria um arquivo ZIP com todo o código do projeto.
       # O comando `zip -r` compacta recursivamente todos os arquivos da pasta atual (.)
       # Os parâmetros `-x ".git/*" ".github/*"` servem para **excluir** a pasta `.git` e a pasta `.github` do ZIP,
