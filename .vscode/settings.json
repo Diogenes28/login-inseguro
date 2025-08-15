@@ -1,3 +1,4 @@
 {
-    "veracode-scan.SCA Features.policy": true
+    "veracode-scan.SCA Features.policy": true,
+    "veracode-scan-language-client.trace.server": "verbose"
 }
