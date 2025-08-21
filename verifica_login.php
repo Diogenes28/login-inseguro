@@ -18,7 +18,8 @@ $sql = "SELECT * FROM usuarios WHERE usuario = '$usuario' AND senha = '$senha'";
 $resultado = $conn->query($sql);
 
 
-// ============================================================
+// ============================================================1
+1
 
 // ❌ VULNERABILIDADE: XSS
 // Se o valor no banco tiver código malicioso, ele será exibido sem escape
