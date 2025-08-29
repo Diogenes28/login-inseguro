@@ -18,7 +18,7 @@ $sql = "SELECT * FROM usuarios WHERE usuario = '$usuario' AND senha = '$senha'";
 $resultado = $conn->query($sql);
 
 
-// ============================================================1
+// ============================================================
 1
 
 // ❌ VULNERABILIDADE: XSS
