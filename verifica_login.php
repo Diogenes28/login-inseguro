@@ -25,7 +25,7 @@ $stmt->execute();
 $resultado = $stmt->get_result();
 */
 
-// ============================================================
+// =====================================
 // ❌ VULNERABILIDADE: XSS
 // Se o valor no banco tiver código malicioso, ele será exibido sem escape
 if ($resultado && $resultado->num_rows > 0) {
