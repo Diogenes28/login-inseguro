@@ -11,14 +11,14 @@ if ($conn->connect_error) {
 $usuario = $_POST['usuario'];
 $senha = $_POST['senha'];
 
-// =========================================++++++++
+// =========================================
 // ❌ VULNERABILIDADE: SQL Injection
 // A entrada do usuário é inserida diretamente na SQL sem validação
 $sql = "SELECT * FROM usuarios WHERE usuario = '$usuario' AND senha = '$senha'";
 $resultado = $conn->query($sql);
 
 
-// ==========================================================+
+// ==========================================================
 
 // ❌ VULNERABILIDADE: XSS
 // Se o valor no banco tiver código malicioso, ele será exibido sem escape
