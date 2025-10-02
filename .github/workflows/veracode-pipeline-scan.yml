@@ -4,6 +4,16 @@ name: Veracode Pipeline Scan
 on:
   push:
     branches: [main]
+  schedule:
+    - cron: '20 18 * * 5' # Roda automaticamente hoje às 15:20 BRT (18:20 UTC)
+        # '20 18 * * 5' significa:
+    # ┌───── minuto (0 - 59)
+    # │ ┌───── hora (0 - 23, no fuso horário UTC)
+    # │ │ ┌───── dia do mês (1 - 31)
+    # │ │ │ ┌───── mês (1 - 12)
+    # │ │ │ │ ┌───── dia da semana (0 - 6, onde 0 = domingo, 1 = segunda, ..., 6 = sábado)
+    # │ │ │ │ │
+    # 20 18 * * 5 => roda toda sexta-feira às 18:20 UTC (15:20 no Brasil, BRT)
 
 jobs:
   pipeline_scan:
