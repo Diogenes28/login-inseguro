@@ -44,7 +44,7 @@ jobs:
       # Etapa para salvar os resultados do Veracode SCA como artifact no GitHub
       # Isso permite baixar o relatório diretamente na aba 'Actions' → 'Artifacts'
       - name: Upload Veracode SCA Results
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           # Nome que aparecerá no painel do GitHub
           name: Veracode_SCA_Results
