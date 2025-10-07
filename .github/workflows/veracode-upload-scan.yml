@@ -32,6 +32,27 @@ jobs:
         env:
           SRCCLR_API_TOKEN: ${{ secrets.SRCCLR_API_TOKEN }}
 
+      # Etapa opcional: listar todos os arquivos gerados no workspace
+      # Isso ajuda a identificar onde o Veracode SCA salvou o relatório JSON.
+      - name: Listar arquivos gerados
+        run: |
+          echo "📂 Listando todos os arquivos gerados após o scan SCA:"
+          ls -la
+          echo "🔍 Listagem recursiva (procure por arquivos .json, .log, ou 'sca'):"
+          ls -laR || true
+
+      # Etapa para salvar os resultados do Veracode SCA como artifact no GitHub
+      # Isso permite baixar o relatório diretamente na aba 'Actions' → 'Artifacts'
+      - name: Upload Veracode SCA Results
+        uses: actions/upload-artifact@v3
+        with:
+          # Nome que aparecerá no painel do GitHub
+          name: Veracode_SCA_Results
+          # Caminho genérico que tenta capturar qualquer relatório com "sca" ou "report" no nome
+          path: '**/*sca*report*.json'
+          # Quantos dias o arquivo ficará disponível para download no GitHub
+          retention-days: 30
+
       # Esta etapa envia o arquivo ZIP com o código para a plataforma Veracode
       # e inicia uma varredura de segurança (scan) automaticamente.
       - name: Veracode Upload & Scan
