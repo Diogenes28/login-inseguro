@@ -25,6 +25,13 @@ jobs:
       - name: Criar pacote ZIP do código PHP
         run: zip -r login-inseguro.zip . -x ".git/*" ".github/*"
 
+      # Etapa para executar a análise SCA (Software Composition Analysis)
+      # que verifica vulnerabilidades em bibliotecas e dependências do projeto.
+      - name: Run Veracode SCA
+        uses: veracode/veracode-sca@v2.1.9
+        env:
+          SRCCLR_API_TOKEN: ${{ secrets.SRCCLR_API_TOKEN }}
+
       # Esta etapa envia o arquivo ZIP com o código para a plataforma Veracode
       # e inicia uma varredura de segurança (scan) automaticamente.
       - name: Veracode Upload & Scan
