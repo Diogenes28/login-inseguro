@@ -14,15 +14,8 @@ $senha = $_POST['senha'];
 // =========================================
 // ❌ VULNERABILIDADE: SQL Injection
 // A entrada do usuário é inserida diretamente na SQL sem validação
-$sql = $conn->prepare("SELECT * FROM usuarios WHERE usuario =? AND senha =?");
-if ($sql) {
-    $sql->bind_param('ss', $usuario, $senha);
-    $sql->execute();
-    $resultado = $sql->get_result();
-    $sql->close();
-} else {
-    echo "Failed to prepare the statement.";
-}
+$sql = "SELECT * FROM usuarios WHERE usuario = '$usuario' AND senha = '$senha'";
+$resultado = $conn->query($sql);
 
 
 // ==========================================================
