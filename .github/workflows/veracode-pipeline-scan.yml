@@ -5,7 +5,7 @@ on:
   push:
     branches: [main]
   schedule:
-    - cron: '20 18 * * 5' # Roda toda sexta-feira às 18:20 UTC (15:20 BRT).
+    - cron: '20 18 * * 5' # Roda toda sexta-feira às 18:20 UTC (15:20 BRT)
 
 jobs:
   pipeline_scan:
@@ -40,8 +40,7 @@ jobs:
           json_output: true
           json_output_file: results.json
           filtered_json_output_file: filtered_results.json
-          artifact_name: "Veracode-Pipeline-Scan-Results
-
+          artifact_name: "Veracode-Pipeline-Scan-Results"
 
       # Converte o JSON gerado em SARIF (formato usado pelo GitHub Code Scanning)
       - name: Converter JSON para SARIF
