@@ -9,23 +9,36 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Clona o código do repositório
+      # 1️⃣ Clona o código do repositório
       - name: Checkout do repositório
         uses: actions/checkout@v3
 
-      # Compacta o projeto para envio ao Veracode
+      # 2️⃣ Compacta o projeto (exclui a pasta .github)
       - name: Compactar projeto
         run: zip -r login-inseguro.zip . -x '*.github/*'
 
-      # Executa o Veracode Pipeline Scan e falha se houver vulnerabilidades altas ou críticas
+      # 3️⃣ Executa o Veracode Pipeline Scan
       - name: Executar Veracode Pipeline Scan
         uses: veracode/Veracode-pipeline-scan-action@v1.0.18
         with:
-          vid: ${{ secrets.VERACODE_API_ID }}
-          vkey: ${{ secrets.VERACODE_API_KEY }}
-          file: login-inseguro.zip
-          debug: true
-          fail_on_severity: "Medium,High"  # Falha automática do pipeline.
-          json_output: true
-          summary_output: true
-          summary_output_file: results_summary.txt
+          vid: ${{ secrets.VERACODE_API_ID }}       # ID da API Veracode
+          vkey: ${{ secrets.VERACODE_API_KEY }}     # Chave da API Veracode
+          file: login-inseguro.zip                  # Arquivo compactado com o código
+          debug: true                               # Ativa modo detalhado
+          fail_on_severity: "Medium,High,Very High" # ⚠️ Faz o job falhar se encontrar Medium ou superior
+          json_output: true                         # Gera JSON dos resultados
+          summary_output: true                      # Gera sumário em texto
+          summary_output_file: results_summary.txt  # Nome do arquivo de sumário
+
+      # 4️⃣ Converte o JSON para SARIF (formato usado pelo GitHub Code Scanning)
+      - name: Converter JSON para SARIF
+        uses: veracode/veracode-pipeline-scan-results-to-sarif@master
+        with:
+          file: results.json
+          fail_build: true  # ⚠️ Se o scan detectar falhas, o pipeline falha aqui também
+
+      # 5️⃣ Envia o arquivo SARIF para o GitHub Code Scanning
+      - name: Enviar resultados para Code Scanning
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: veracode-results.sarif
