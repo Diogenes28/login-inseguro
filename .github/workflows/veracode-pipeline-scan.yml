@@ -29,8 +29,8 @@ jobs:
           file: login-inseguro.zip
           debug: true
 
-          # ⚠️ Severidade mínima que causará falha (VeryHigh e High)
-          fail_on_severity: "VeryHigh,High"
+          # ⚠️ Faz o job falhar se forem encontradas vulnerabilidades
+          fail_build: true
 
           # Opcional: salva resultados detalhados
           summary_display: true
