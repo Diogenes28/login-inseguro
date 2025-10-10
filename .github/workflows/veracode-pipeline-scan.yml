@@ -1,38 +1,32 @@
-# Nome do workflow que aparecerá na aba "Actions" do GitHub
 name: Veracode Pipeline Scan
 
-# Define quando o workflow será executado
-# Neste caso, ele roda automaticamente quando houver um "push" para a branch "main"
+# Dispara automaticamente ao fazer push na branch main
 on:
   push:
     branches: [main]
+  schedule:
+    - cron: '20 18 * * 5' # Roda toda sexta-feira às 18:20 UTC (15:20 BRT).
 
 jobs:
   pipeline_scan:
-    # Ambiente onde o job será executado
     runs-on: ubuntu-latest
 
     steps:
-      # Baixar o código do repositório
+      # Clona o código do repositório
       - name: Checkout do repositório
         uses: actions/checkout@v3
 
-      # Criar um pacote ZIP do código
-      - name: Criar pacote ZIP do código
-        run: zip -r sac.zip . -x ".git/*" ".github/*"
+      # Compacta o projeto (exclui a pasta .github para não ser analisada)
+      - name: Compactar projeto para envio ao Veracode
+        run: zip -r login-inseguro.zip . -x '*.github/*'
 
-      # Executar o Veracode Pipeline Scan
-      - name: Veracode Pipeline-Scan
+      # Executa o Veracode Pipeline Scan
+      - name: Executar Veracode Pipeline Scan
         uses: veracode/Veracode-pipeline-scan-action@v1.0.18
         with:
-          # Credenciais armazenadas nos Secrets do repositório
           vid: ${{ secrets.VERACODE_API_ID }}
           vkey: ${{ secrets.VERACODE_API_KEY }}
-
-          # Arquivo ZIP do projeto
-          file: sac.zip
-
-          # Modo de depuração (logs detalhados)
+          file: login-inseguro.zip
           debug: true
 
           # ⚠️ Faz o job falhar se forem encontradas vulnerabilidades
@@ -41,10 +35,22 @@ jobs:
           # ⚠️ Severidade mínima que causará falha (VeryHigh e High)
           fail_on_severity: "VeryHigh,High"
 
-          # Opcional: mostra resumo dos resultados no console
+          # Opcional: salva resultados detalhados
           summary_display: true
-
-          # Opcional: salva resultados em JSON
           json_output: true
           json_output_file: results.json
           filtered_json_output_file: filtered_results.json
+          artifact_name: "Veracode-Pipeline-Scan-Results"
+
+      # Converte o JSON gerado em SARIF (formato usado pelo GitHub Code Scanning)
+      - name: Converter JSON para SARIF
+        uses: veracode/veracode-pipeline-scan-results-to-sarif@ff08ae5b45d5384cb4679932f184c013d34da9be
+        with:
+          file: results.json
+          fail_build: false  # Não falha o build nesta etapa
+
+      # Envia o relatório SARIF para o GitHub Code Scanning
+      - name: Enviar SARIF para Code Scanning
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: veracode-results.sarif
