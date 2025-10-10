@@ -1,51 +1,43 @@
+# Nome do workflow que aparecerá na aba "Actions" do GitHub
 name: Veracode Pipeline Scan
 
-# Dispara automaticamente ao fazer push na branch main
+# Define quando o workflow será executado
+# Neste caso, ele roda automaticamente quando houver um "push" para a branch "main"
 on:
   push:
     branches: [main]
-  schedule:
-    - cron: '20 18 * * 5' # Roda automaticamente hoje às 15:20 BRT (18:20 UTC).
-        # '20 18 * * 5' significa:
-    # ┌───── minuto (0 - 59)
-    # │ ┌───── hora (0 - 23, no fuso horário UTC)
-    # │ │ ┌───── dia do mês (1 - 31)
-    # │ │ │ ┌───── mês (1 - 12)
-    # │ │ │ │ ┌───── dia da semana (0 - 6, onde 0 = domingo, 1 = segunda, ..., 6 = sábado)
-    # │ │ │ │ │
-    # 20 18 * * 5 => roda toda sexta-feira às 18:20 UTC (15:20 no Brasil, BRT)
-
+    
 jobs:
+  # Nome do job
   pipeline_scan:
-    runs-on: ubuntu-latest  # Execução na nuvem (máquina do GitHub)
+    # Ambiente onde o job será executado
+    runs-on: ubuntu-latest
 
     steps:
-      # Clona o código do repositório
+      # Baixar o código do repositório
       - name: Checkout do repositório
         uses: actions/checkout@v3
 
-      # Compacta o projeto (exclui a pasta .github para não ser analisada)
-      - name: Compactar projeto para envio ao Veracode
-        run: zip -r login-inseguro.zip . -x '*.github/*'
+      # Criar um pacote ZIP do código
+      - name: Criar pacote ZIP do código
+        run: zip -r sac.zip . -x ".git/*" ".github/*"
 
-      # Executa o Veracode Pipeline Scan
+      # Executar o Veracode Pipeline Scan
       - name: Executar Veracode Pipeline Scan
         uses: veracode/Veracode-pipeline-scan-action@d5dbb47cb0202d511be5fd10a04071d32f74ace6
         with:
-          vid: ${{ secrets.VERACODE_API_ID }}       #  ID da API Veracode
-          vkey: ${{ secrets.VERACODE_API_KEY }}     #  Chave da API Veracode
-          file: login-inseguro.zip                  #  Arquivo compactado com o código
-          debug: true                               #  Ativa modo de depuração
+          # Credenciais armazenadas nos Secrets do repositório
+          vid: ${{ secrets.VERACODE_API_ID }}
+          vkey: ${{ secrets.VERACODE_API_KEY }}
 
-      # Converte o JSON gerado em SARIF (formato usado pelo GitHub Code Scanning)
-      - name: Converter JSON para SARIF
-        uses: veracode/veracode-pipeline-scan-results-to-sarif@ff08ae5b45d5384cb4679932f184c013d34da9be
-        with:
-          file: results.json        # Entrada: JSON gerado pelo Veracode
-          fail_build: false         # Não falha o build, mesmo com vulnerabilidades
+          # Arquivo ZIP do projeto
+          file: sac.zip
 
-      #  Envia o relatório SARIF para o GitHub Code Scanning
-      - name: Enviar SARIF para Code Scanning
-        uses: github/codeql-action/upload-sarif@v3
-        with:
-          sarif_file: veracode-results.sarif  # Nome correto do arquivo SARIF gerado
+          # Modo de depuração
+          debug: true
+
+          # ⚠️ Faz o pipeline falhar se houver vulnerabilidades
+          fail_build_on_vulnerabilities: true
+
+          # ⚠️ Define a severidade mínima para falha (VeryHigh = crítica)
+          fail_severity: VeryHigh
