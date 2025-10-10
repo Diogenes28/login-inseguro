@@ -35,6 +35,13 @@ jobs:
           # ⚠️ Severidade mínima que causará falha (VeryHigh e High)
           fail_on_severity: "VeryHigh,High"
 
+          # Opcional: salva resultados detalhados
+          summary_display: true
+          json_output: true
+          json_output_file: results.json
+          filtered_json_output_file: filtered_results.json
+          artifact_name: "Veracode-Pipeline-Scan-Results
+
 
       # Converte o JSON gerado em SARIF (formato usado pelo GitHub Code Scanning)
       - name: Converter JSON para SARIF
