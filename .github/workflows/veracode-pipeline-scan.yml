@@ -21,6 +21,10 @@ jobs:
           vid: ${{ secrets.VERACODE_API_ID }}
           vkey: ${{ secrets.VERACODE_API_KEY }}
           file: login-inseguro.zip
+<<<<<<< HEAD
           debug: false
           fail_on_severity: "Very High,High,Medium"
+=======
+          fail_on_severity: "Medium,High,Very High"  # falha se houver essas severidades
+>>>>>>> 5eecd9f2a91ae7048dbe7c734359bfd00c36a86a
           fail_build: true
