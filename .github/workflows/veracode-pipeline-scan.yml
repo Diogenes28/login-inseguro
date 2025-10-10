@@ -1,7 +1,5 @@
-# Nome do workflow exibido na aba "Actions" do GitHub
-name: Veracode Pipeline Scan - Falha se houver vulnerabilidades
+name: Veracode Pipeline Scan - Simples (falha se houver vulnerabilidades)
 
-# Quando o pipeline será executado
 on:
   push:
     branches: [main]
@@ -11,42 +9,18 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Etapa 1: Clonar o repositório
-      - name: Checkout do repositório
+      - name: Checkout
         uses: actions/checkout@v3
 
-      # Etapa 2: Compactar o projeto (exceto a pasta .github)
-      - name: Compactar projeto para envio
+      - name: Compactar projeto
         run: zip -r login-inseguro.zip . -x '*.github/*'
 
-      # Etapa 3: Executar o Veracode Pipeline Scan
-      - name: Executar Veracode Pipeline Scan
+      - name: Veracode Pipeline Scan (falha se houver vulnerabilidades)
         uses: veracode/Veracode-pipeline-scan-action@v1.0.18
         with:
-          # Credenciais armazenadas nos segredos do GitHub
           vid: ${{ secrets.VERACODE_API_ID }}
           vkey: ${{ secrets.VERACODE_API_KEY }}
-
-          # Arquivo compactado que será analisado
           file: login-inseguro.zip
-
-          # Ativa exibição detalhada
-          debug: true
-          verbose: true
-
-          # Exibe e salva o resumo e os resultados em JSON
-          summary_display: true
-          summary_output: true
-          summary_output_file: results_summary.txt
-          json_output: true
-          json_output_file: results.json
-
-          # ⚠️ Configurações de controle de falha
-          fail_on_severity: "Medium,High,Critical"  # Falhar se encontrar vulnerabilidades médias, altas ou críticas
-          fail_build: true  # Faz o job falhar quando a condição acima for atendida
-
-          # (Opcional) Caso queira falhar em CWEs específicos:
-          # fail_on_cwe: "79,89"  # 79 = Cross-Site Scripting, 89 = SQL Injection
-
-          # Nome do projeto exibido no relatório do Veracode
-          project_name: "login-inseguro"
+          debug: false
+          fail_on_severity: "Very High,High,Medium"
+          fail_build: true
