@@ -25,7 +25,7 @@ jobs:
           vkey: ${{ secrets.VERACODE_API_KEY }}
           file: login-inseguro.zip
           debug: true
-          fail_on_severity: "Very High,High"  # Falha automática do pipeline
+          fail_on_severity: "Very High,High"  # Falha automática do pipeline.
           json_output: true
           summary_output: true
           summary_output_file: results_summary.txt
