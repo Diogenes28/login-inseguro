@@ -31,9 +31,7 @@ if ($resultado && $resultado->num_rows > 0) {
 }
 
 // ✅ CORREÇÃO — Substitua a linha de exibição por:
-/*
-echo "<h2>Bem-vindo, " . htmlspecialchars($linha['usuario']) . "!</h2>";
-*/
+
 
 $conn->close();
 ?>
