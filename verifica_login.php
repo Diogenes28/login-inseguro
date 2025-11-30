@@ -30,7 +30,7 @@ if ($resultado && $resultado->num_rows > 0) {
     echo "<a href='login.html'>Voltar</a>";
 }
 
-// ✅ CORREÇÃO — Substitua a linha de exibição por:
+// CORREÇÃO — Substitua a linha de exibição por:
 
 
 $conn->close();
