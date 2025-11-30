@@ -33,7 +33,7 @@ jobs:
           fail_build: true
 
           # ⚠️ Severidade mínima que causará falha (VeryHigh e High)
-          fail_on_severity: "VeryHigh,High"
+          fail_on_severity: "Medium,VeryHigh,High"
 
           # Opcional: salva resultados detalhados
           summary_display: true
