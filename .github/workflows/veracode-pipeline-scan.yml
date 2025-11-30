@@ -32,8 +32,8 @@ jobs:
           # ⚠️ Faz o job falhar se forem encontradas vulnerabilidades
           fail_build: true
 
-          # ⚠️ Severidade mínima que causará falha (VeryHigh e High)
-          fail_on_severity: "VeryHigh,High"
+          # ⚠️ Severidade mínima que causará falha (Meium, VeryHigh e High)
+          fail_on_severity: "Medium,VeryHigh,High"
 
           # Opcional: salva resultados detalhados
           summary_display: true
