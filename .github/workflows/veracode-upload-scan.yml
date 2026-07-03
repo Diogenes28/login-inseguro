@@ -29,7 +29,7 @@ jobs:
       # e inicia uma varredura de segurança (scan) automaticamente.
       - name: Veracode Upload & Scan
         # Ação oficial da Veracode para fazer upload e scan do código
-        uses: veracode/veracode-uploadandscan-action@v2
+        uses: veracode/veracode-uploadandscan-action@0.2.11
         with:
           # Nome da aplicação na Veracode. Se ela ainda não existir, será criada automaticamente.
           appname: "login-inseguro"
